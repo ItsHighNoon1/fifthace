@@ -17,4 +17,4 @@
  * @param string A pointer to the string to hash. Assumed to be null terminated.
  * @return The hashed string value.
  */
-unsigned long fa_hash(const char* string);
+unsigned long fa_util_hash(const char* string);

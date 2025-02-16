@@ -8,7 +8,7 @@
 
 #include "util.h"
 
-unsigned long fa_hash(const char* string) {
+unsigned long fa_util_hash(const char* string) {
     unsigned long hash = 5381;
     char c;
     while ((c = *string++)) {

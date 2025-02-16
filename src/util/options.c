@@ -11,13 +11,13 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "util.h"
+#include "util/util.h"
 
-#define HASH_BUCKETS 23
+#define HASH_BUCKETS 32
 
 typedef struct HashTableEntryStruct {
     char name[FA_OPTION_MAX_LENGTH];
-    FA_Value value;
+    FA_OptionValue value;
     struct HashTableEntryStruct* next;
     struct HashTableEntryStruct* prev;
 } HashTableEntry;
@@ -26,7 +26,7 @@ static HashTableEntry* hash_table[HASH_BUCKETS];
 
 static HashTableEntry* find(const char* name, int bucket) {
     if (bucket == -1) {
-        bucket = (fa_hash(name) % HASH_BUCKETS);
+        bucket = (fa_util_hash(name) % HASH_BUCKETS);
     }
     
     for (HashTableEntry* entry = hash_table[bucket]; entry != NULL; entry = entry->next) {
@@ -60,7 +60,7 @@ int fa_options_set_int(const char* name, int value) {
     if (strlen(name) >= FA_OPTION_MAX_LENGTH) {
         return 1;
     }
-    int bucket = (fa_hash(name) % HASH_BUCKETS);
+    int bucket = (fa_util_hash(name) % HASH_BUCKETS);
     
     HashTableEntry* old_entry = find(name, bucket);
 
@@ -93,7 +93,7 @@ int fa_options_set_float(const char* name, float value) {
     if (strlen(name) >= FA_OPTION_MAX_LENGTH) {
         return 1;
     }
-    int bucket = (fa_hash(name) % HASH_BUCKETS);
+    int bucket = (fa_util_hash(name) % HASH_BUCKETS);
     
     HashTableEntry* old_entry = find(name, bucket);
 
@@ -126,7 +126,7 @@ int fa_options_set_string(const char* name, const char* value) {
     if (strlen(name) >= FA_OPTION_MAX_LENGTH) {
         return 1;
     }
-    int bucket = (fa_hash(name) % HASH_BUCKETS);
+    int bucket = (fa_util_hash(name) % HASH_BUCKETS);
     
     HashTableEntry* old_entry = find(name, bucket);
 
@@ -161,7 +161,7 @@ int fa_options_unset(const char* name) {
     if (strlen(name) >= FA_OPTION_MAX_LENGTH) {
         return 1;
     }
-    int bucket = (fa_hash(name) % HASH_BUCKETS);
+    int bucket = (fa_util_hash(name) % HASH_BUCKETS);
     
     HashTableEntry* entry = find(name, bucket);
 
@@ -186,13 +186,13 @@ int fa_options_unset(const char* name) {
     return 0;
 }
 
-FA_Value fa_options_get(const char* name) {
+FA_OptionValue fa_options_get(const char* name) {
     HashTableEntry* entry = find(name, -1);
 
     if (entry != NULL) {
         return entry->value;
     } else {
-        FA_Value dummy;
+        FA_OptionValue dummy;
         dummy.type = FA_OPTION_UNSET;
         return dummy;
     }

@@ -43,7 +43,7 @@ typedef struct {
          */
         char* string_value;
     };
-} FA_Value;
+} FA_OptionValue;
 
 void _fa_options_init();
 
@@ -85,4 +85,4 @@ int fa_options_unset(const char* name);
  * @param name The name of the option. Assumed to be null terminated.
  * @return The value of the requested parameter. See FA_Value. Will be FA_OPTION_UNSET if the option is not set or if name is too long.
  */
-FA_Value fa_options_get(const char* name);
+FA_OptionValue fa_options_get(const char* name);
