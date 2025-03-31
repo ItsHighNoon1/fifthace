@@ -1,5 +1,6 @@
 # Build output
 build/
+src/shader/*.bin
 
 # Doxygen output
 html/

@@ -39,6 +39,8 @@ static VkFormat swap_chain_format;
 static VkExtent2D swap_chain_extent;
 static VkImage* swap_chain_images;
 static int swap_chain_images_len;
+static VkImageView* swap_chain_image_views;
+static int swap_chain_image_views_len;
 
 struct SwapChainSupportDetails {
     VkSurfaceCapabilitiesKHR capabilities;
@@ -197,6 +199,38 @@ static int check_validation_layers() {
     }
 
     return found_all;
+}
+
+static void create_graphics_pipeline() {
+
+}
+
+static void create_image_views() {
+    swap_chain_image_views_len = swap_chain_images_len;
+    swap_chain_image_views = malloc(swap_chain_image_views_len * sizeof(VkImageView));
+
+    for (int image_idx = 0; image_idx < swap_chain_images_len; image_idx++) {
+        VkImageViewCreateInfo create_info;
+        memset(&create_info, 0, sizeof(create_info));
+        create_info.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+        create_info.image = swap_chain_images[image_idx];
+        create_info.viewType = VK_IMAGE_VIEW_TYPE_2D;
+        create_info.format = swap_chain_format;
+        create_info.components.r = VK_COMPONENT_SWIZZLE_IDENTITY;
+        create_info.components.g = VK_COMPONENT_SWIZZLE_IDENTITY;
+        create_info.components.b = VK_COMPONENT_SWIZZLE_IDENTITY;
+        create_info.components.a = VK_COMPONENT_SWIZZLE_IDENTITY;
+        create_info.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+        create_info.subresourceRange.baseMipLevel = 0;
+        create_info.subresourceRange.levelCount = 1;
+        create_info.subresourceRange.baseArrayLayer = 0;
+        create_info.subresourceRange.layerCount = 1;
+
+        if (vkCreateImageView(device, &create_info, NULL, &swap_chain_image_views[image_idx]) != VK_SUCCESS) {
+            printf("Failed to create image view %d :(\n", image_idx);
+            exit(1);
+        }
+    }
 }
 
 static void create_swap_chain() {
@@ -426,9 +460,14 @@ void _fa_vk_init() {
     pick_physical_device();
     create_logical_device();
     create_swap_chain();
+    create_image_views();
+    create_graphics_pipeline();
 }
 
 void _fa_vk_teardown() {
+    for (int image_view_idx = 0; image_view_idx < swap_chain_image_views_len; image_view_idx++) {
+        vkDestroyImageView(device, swap_chain_image_views[image_view_idx], NULL);
+    }
     vkDestroySwapchainKHR(device, swap_chain, NULL);
     vkDestroyDevice(device, NULL);
     vkDestroySurfaceKHR(instance, surface, NULL);
